@@ -1,0 +1,18 @@
+# IDE Settings
+.idea/
+.eclipse/
+.settings/
+.vscode/
+.classpath
+.project
+.factorypath
+*.iml
+*.iws
+*.ipr
+.sts4-cache/
+
+# Build Files
+target/
+build/
+out/
+bin/
