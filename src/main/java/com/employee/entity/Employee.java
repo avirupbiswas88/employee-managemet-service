@@ -1,6 +1,7 @@
 package com.employee.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
 
@@ -19,5 +20,6 @@ public class Employee {
     @Column(nullable=false)
     private String country;
     @Column(nullable=false)
+    @Positive(message = "salary should be greater than zero")
     private Double salary;
 }
