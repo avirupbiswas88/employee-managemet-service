@@ -1,5 +1,6 @@
 package com.employee.controller;
 
+import com.employee.exception.EmployeeNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -37,9 +38,77 @@ public class EmployeeControllerTest {
      */
     @Test
     void shouldCreateEmployee() throws Exception {
-        String request = """
+        String request1 = """
                 {
                 "fullName":"Avirup Biswas",
+                "jobTitle":"Software Developer",
+                "country":"India",
+                "salary":15000
+                }
+                """;
+        String request2 = """
+                {
+                "fullName":"Sambit Mukherjee",
+                "jobTitle":"Software Architect",
+                "country":"India",
+                "salary":900000
+                }
+                """;
+        mockMvc.perform(post("/employees/create")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request1))
+                .andExpect(status().isCreated());
+        mockMvc.perform(post("/employees/create")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request2))
+                .andExpect(status().isCreated());
+    }
+    @Test
+    void createEmployee_missingJobTitleValidation() throws Exception {
+        String request = """
+                {
+                "fullName":"Sambit Mukherjee",
+                "country":"India",
+                "salary":15000
+                }
+                """;
+        mockMvc.perform(post("/employees/create")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                .andExpect(status().isCreated());
+    }
+    @Test
+    void createEmployee_missingCountryValidation() throws Exception {
+        String request = """
+                {
+                "fullName":"Sambit Mukherjee",
+                "jobTitle":"Software Developer",
+                "salary":15000
+                }
+                """;
+        mockMvc.perform(post("/employees/create")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                .andExpect(status().isCreated());
+    }
+    @Test
+    void createEmployee_missingSalaryValidation() throws Exception {
+        String request = """
+                {
+                "fullName":"Sambit Mukherjee",
+                "jobTitle":"Software Developer",
+                "country":"India"
+                }
+                """;
+        mockMvc.perform(post("/employees/create")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                .andExpect(status().isCreated());
+    }
+    @Test
+    void createEmployee_missingFullNameValidation() throws Exception {
+        String request = """
+                {
                 "jobTitle":"Software Developer",
                 "country":"India",
                 "salary":15000
@@ -51,6 +120,7 @@ public class EmployeeControllerTest {
                 .andExpect(status().isCreated());
     }
 
+
     @Test
     void shouldReturnAllEmployees() throws Exception {
 
@@ -60,32 +130,39 @@ public class EmployeeControllerTest {
 
     @Test
     void testGetEmployee() throws Exception {
-        mockMvc.perform(get("/employees/get/1")
+        mockMvc.perform(get("/employees/get/452")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value("1"))
+                .andExpect(jsonPath("$.id").value("452"))
                 .andExpect(jsonPath("$.fullName").value("Avirup Biswas"));
+    }
+    @Test
+    void testGetEmployee_noDataFound() throws Exception {
+        mockMvc.perform(get("/employees/get/5")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 
     @Test
     void testUpdateEmployee() throws Exception {
 
-        mockMvc.perform(put("/employees/1")
+        mockMvc.perform(put("/employees/update/352")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                         {
-                        "name":"Avirup Biswas",
-                        "department":"IT",
-                        "salary":50000
+                        "fullName":"Avirup Biswas",
+                        "jobTitle":"IT",
+                        "salary":50000,
+                        "country":"UK"
                         }
                         """))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Avirup Biswas"));
+                .andExpect(jsonPath("$.fullName").value("Avirup Biswas"));
     }
 
     @Test
     void testDeleteEmployee() throws Exception {
-        mockMvc.perform(delete("/employees/1"))
+        mockMvc.perform(delete("/employees/delete/353"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Employee deleted"));
     }

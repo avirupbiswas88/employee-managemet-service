@@ -17,4 +17,12 @@ public class ExceptionHandlerAdvice {
                 .body(ex.getMessage());
 
     }
+    @ExceptionHandler(MissingRequiredDataException.class)
+    public ResponseEntity<String> handleMissingData(
+            MissingRequiredDataException ex){
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ex.getMessage());
+
+    }
 }

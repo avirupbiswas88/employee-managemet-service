@@ -4,6 +4,7 @@ import com.employee.dto.EmployeeRequestDTO;
 import com.employee.dto.EmployeeResponseDTO;
 import com.employee.entity.Employee;
 import com.employee.exception.EmployeeNotFoundException;
+import com.employee.exception.MissingRequiredDataException;
 import com.employee.repository.EmployeeRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,18 +22,18 @@ public class EmployeeServiceImpl implements EmployeeService {
     EmployeeRepository repository;
 
     @Override
-    public EmployeeResponseDTO create(EmployeeRequestDTO dto) {
+    public EmployeeResponseDTO create(EmployeeRequestDTO request) {
         try {
-            Employee employee = this.mapEmployeeEntityFromDto(dto);
+            Employee employee = this.mapEmployeeEntityFromDto(request);
             Employee savedEmployee = repository.save(employee);
             EmployeeResponseDTO response = this.mapEmployeeResponseFromDatabaseResponse(savedEmployee);
-            log.info("employee created with Id: {}",response.getId());
+            log.info("employee created with Id: {}", response.getId());
             return response;
         } catch (Exception ex) {
             log.info("exception occurred while transforming and saving employee data in database with exception: {}", ex.getMessage());
+            throw new MissingRequiredDataException("required data not found for Id: " + request);
         }
 
-        return null;
     }
 
     @Override
@@ -45,6 +46,39 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public List<EmployeeResponseDTO> getAllEmployees() {
         return repository.findAll().stream().map(this::mapEmployeeResponseFromDatabaseResponse).toList();
+    }
+
+    @Override
+    public EmployeeResponseDTO updateEmployee(Long id, EmployeeRequestDTO request) {
+        Employee employee = repository.findById(id)
+                .orElseThrow(() -> new EmployeeNotFoundException(id));
+        try {
+            employee.setFullName(request.getFullName());
+            employee.setJobTitle(request.getJobTitle());
+            employee.setCountry(request.getCountry());
+            employee.setSalary(request.getSalary());
+            Employee updatedEmployee = repository.save(employee);
+            EmployeeResponseDTO response = this.mapEmployeeResponseFromDatabaseResponse(updatedEmployee);
+            log.info("employee updated with Id: {} and response- {}", response.getId(), response);
+            return response;
+        } catch (Exception ex) {
+            log.info("exception occurred while transforming and updating employee data in database with exception: {}", ex.getMessage());
+        }
+        return null;
+    }
+
+    @Override
+    public Long deleteEmployee(Long id) {
+        try {
+            if (!repository.existsById(id)) {
+                throw new EmployeeNotFoundException(id);
+            }
+            repository.deleteById(id);
+            return id;
+        } catch (Exception ex) {
+            log.info("exception occurred while deleting employee data in database with exception: {}", ex.getMessage());
+        }
+        return null;
     }
 
     private Employee mapEmployeeEntityFromDto(EmployeeRequestDTO dto) {
