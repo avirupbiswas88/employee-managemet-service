@@ -75,7 +75,7 @@ public class EmployeeControllerTest {
         mockMvc.perform(post("/employees/create")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(request))
-                .andExpect(status().isCreated());
+                .andExpect(status().isBadRequest());
     }
     @Test
     void createEmployee_missingCountryValidation() throws Exception {
@@ -89,7 +89,7 @@ public class EmployeeControllerTest {
         mockMvc.perform(post("/employees/create")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(request))
-                .andExpect(status().isCreated());
+                .andExpect(status().isBadRequest());
     }
     @Test
     void createEmployee_missingSalaryValidation() throws Exception {
@@ -103,12 +103,13 @@ public class EmployeeControllerTest {
         mockMvc.perform(post("/employees/create")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(request))
-                .andExpect(status().isCreated());
+                .andExpect(status().isBadRequest());
     }
     @Test
     void createEmployee_missingFullNameValidation() throws Exception {
         String request = """
                 {
+                "fullName":"",
                 "jobTitle":"Software Developer",
                 "country":"India",
                 "salary":15000
@@ -117,7 +118,22 @@ public class EmployeeControllerTest {
         mockMvc.perform(post("/employees/create")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(request))
-                .andExpect(status().isCreated());
+                .andExpect(status().isBadRequest());
+    }
+    @Test
+    void createEmployee_salaryValueShouldBeGreaterThanZero() throws Exception {
+        String request = """
+                {
+                "fullName":"Avirup Biswas",
+                "jobTitle":"Software Developer",
+                "country":"India",
+                "salary":-50
+                }
+                """;
+        mockMvc.perform(post("/employees/create")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                .andExpect(status().isBadRequest());
     }
 
 
