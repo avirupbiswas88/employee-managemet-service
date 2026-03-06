@@ -10,6 +10,7 @@ import lombok.Data;
 public class Employee {
 
     @Id
+    @GeneratedValue
     private Long id;
     @Column(nullable=false)
     private String fullName;

@@ -9,4 +9,15 @@ public class EmployeeResponseDTO {
     private String jobTitle;
     private String country;
     private Double salary;
+
+    @Override
+    public String toString() {
+        return "EmployeeResponseDTO{" +
+                "id=" + id +
+                ", fullName='" + fullName + '\'' +
+                ", jobTitle='" + jobTitle + '\'' +
+                ", country='" + country + '\'' +
+                ", salary=" + salary +
+                '}';
+    }
 }

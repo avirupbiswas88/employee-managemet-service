@@ -3,11 +3,14 @@ package com.employee.service;
 import com.employee.dto.EmployeeRequestDTO;
 import com.employee.dto.EmployeeResponseDTO;
 import com.employee.entity.Employee;
+import com.employee.exception.EmployeeNotFoundException;
 import com.employee.repository.EmployeeRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -22,12 +25,26 @@ public class EmployeeServiceImpl implements EmployeeService {
         try {
             Employee employee = this.mapEmployeeEntityFromDto(dto);
             Employee savedEmployee = repository.save(employee);
-            return this.mapEmployeeResponseFromDatabaseResponse(savedEmployee);
+            EmployeeResponseDTO response = this.mapEmployeeResponseFromDatabaseResponse(savedEmployee);
+            log.info("employee created with Id: {}",response.getId());
+            return response;
         } catch (Exception ex) {
             log.info("exception occurred while transforming and saving employee data in database with exception: {}", ex.getMessage());
         }
 
         return null;
+    }
+
+    @Override
+    public EmployeeResponseDTO getEmployee(Long id) {
+        Employee employee = repository.findById(id)
+                .orElseThrow(() -> new EmployeeNotFoundException(id));
+        return this.mapEmployeeResponseFromDatabaseResponse(employee);
+    }
+
+    @Override
+    public List<EmployeeResponseDTO> getAllEmployees() {
+        return repository.findAll().stream().map(this::mapEmployeeResponseFromDatabaseResponse).toList();
     }
 
     private Employee mapEmployeeEntityFromDto(EmployeeRequestDTO dto) {

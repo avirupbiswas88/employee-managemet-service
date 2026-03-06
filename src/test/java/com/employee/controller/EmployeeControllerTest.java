@@ -7,10 +7,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -65,6 +63,30 @@ public class EmployeeControllerTest {
         mockMvc.perform(get("/employees/get/1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.fullName").value("Avirup"));
+                .andExpect(jsonPath("$.id").value("1"))
+                .andExpect(jsonPath("$.fullName").value("Avirup Biswas"));
+    }
+
+    @Test
+    void testUpdateEmployee() throws Exception {
+
+        mockMvc.perform(put("/employees/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                        {
+                        "name":"Avirup Biswas",
+                        "department":"IT",
+                        "salary":50000
+                        }
+                        """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Avirup Biswas"));
+    }
+
+    @Test
+    void testDeleteEmployee() throws Exception {
+        mockMvc.perform(delete("/employees/1"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Employee deleted"));
     }
 }
