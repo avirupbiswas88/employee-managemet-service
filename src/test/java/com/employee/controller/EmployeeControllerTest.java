@@ -1,7 +1,11 @@
 package com.employee.controller;
 
+import com.employee.dto.EmployeeSalaryResponseDTO;
 import com.employee.exception.EmployeeNotFoundException;
+import com.employee.service.EmployeeServiceImpl;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,6 +21,8 @@ public class EmployeeControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+    @InjectMocks
+    private EmployeeServiceImpl employeeService;
 
     /**
      * Verifies that a new Employee can be successfully created.
@@ -63,6 +69,7 @@ public class EmployeeControllerTest {
                         .content(request2))
                 .andExpect(status().isCreated());
     }
+
     @Test
     void createEmployee_missingJobTitleValidation() throws Exception {
         String request = """
@@ -77,6 +84,7 @@ public class EmployeeControllerTest {
                         .content(request))
                 .andExpect(status().isBadRequest());
     }
+
     @Test
     void createEmployee_missingCountryValidation() throws Exception {
         String request = """
@@ -91,6 +99,7 @@ public class EmployeeControllerTest {
                         .content(request))
                 .andExpect(status().isBadRequest());
     }
+
     @Test
     void createEmployee_missingSalaryValidation() throws Exception {
         String request = """
@@ -105,6 +114,7 @@ public class EmployeeControllerTest {
                         .content(request))
                 .andExpect(status().isBadRequest());
     }
+
     @Test
     void createEmployee_missingFullNameValidation() throws Exception {
         String request = """
@@ -120,6 +130,7 @@ public class EmployeeControllerTest {
                         .content(request))
                 .andExpect(status().isBadRequest());
     }
+
     @Test
     void createEmployee_salaryValueShouldBeGreaterThanZero() throws Exception {
         String request = """
@@ -152,6 +163,7 @@ public class EmployeeControllerTest {
                 .andExpect(jsonPath("$.id").value("452"))
                 .andExpect(jsonPath("$.fullName").value("Avirup Biswas"));
     }
+
     @Test
     void testGetEmployee_noDataFound() throws Exception {
         mockMvc.perform(get("/employees/get/5")
@@ -165,13 +177,13 @@ public class EmployeeControllerTest {
         mockMvc.perform(put("/employees/update/352")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                        {
-                        "fullName":"Avirup Biswas",
-                        "jobTitle":"IT",
-                        "salary":50000,
-                        "country":"UK"
-                        }
-                        """))
+                                {
+                                "fullName":"Avirup Biswas",
+                                "jobTitle":"IT",
+                                "salary":50000,
+                                "country":"UK"
+                                }
+                                """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.fullName").value("Avirup Biswas"));
     }
@@ -182,4 +194,22 @@ public class EmployeeControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string("Employee deleted"));
     }
+
+    @Test
+    void shouldReturnSalaryDetailsForIndia() throws Exception {
+
+        EmployeeSalaryResponseDTO response =
+                new EmployeeSalaryResponseDTO(1L, 100000, 10000, 90000);
+
+        Mockito.when(employeeService.calculateSalary(1L))
+                .thenReturn(response);
+
+        mockMvc.perform(get("/employees/1/salary"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.Id").value(1))
+                .andExpect(jsonPath("$.grossSalary").value(100000))
+                .andExpect(jsonPath("$.deduction").value(10000))
+                .andExpect(jsonPath("$.netSalary").value(90000));
+    }
+
 }
