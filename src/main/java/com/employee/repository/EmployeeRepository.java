@@ -12,4 +12,10 @@ import java.util.List;
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     @Query(value = "SELECT * FROM employees WHERE LOWER(country) = LOWER(:country)", nativeQuery = true)
     List<Employee> findByCountryIgnoreCase(@Param("country") String country);
+
+    @Query(
+            value = "SELECT AVG(net_salary) FROM employees WHERE LOWER(job_title) = LOWER(:jobTitle)",
+            nativeQuery = true
+    )
+    Double findAverageSalaryByJobTitle(@Param("jobTitle") String jobTitle);
 }

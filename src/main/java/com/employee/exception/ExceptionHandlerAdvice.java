@@ -32,4 +32,18 @@ public class ExceptionHandlerAdvice {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ex.getMessage());
     }
+
+    @ExceptionHandler(JobTitleNotFoundException.class)
+    public ResponseEntity<String> handleJobTitleNotFound(
+            JobTitleNotFoundException ex) {
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ex.getMessage());
+    }
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleInvalidInput(
+            IllegalArgumentException ex) {
+
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
 }

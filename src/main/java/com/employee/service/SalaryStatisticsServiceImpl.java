@@ -1,8 +1,10 @@
 package com.employee.service;
 
+import com.employee.dto.AverageSalaryResponseDTO;
 import com.employee.dto.EmployeeStatsByCountryResponseDTO;
 import com.employee.entity.Employee;
 import com.employee.exception.EmployeeServiceGenericException;
+import com.employee.exception.JobTitleNotFoundException;
 import com.employee.repository.EmployeeRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -55,5 +57,34 @@ public class SalaryStatisticsServiceImpl implements SalaryStatisticsService {
             log.info("error while processing employee stats by country with exception: {}", e.getMessage());
             throw new EmployeeServiceGenericException("error while processing employee stats by country with exception");
         }
+    }
+
+    @Override
+    public AverageSalaryResponseDTO getAverageSalary(String jobTitle) {
+
+        log.info("Fetching average salary for jobTitle= {}", jobTitle);
+
+        if (jobTitle == null || jobTitle.isBlank()) {
+            log.error("Invalid job title provided");
+            throw new IllegalArgumentException("job title cannot be empty");
+        }
+
+        Double avgSalary = repository.findAverageSalaryByJobTitle(jobTitle);
+
+        if (avgSalary == null) {
+
+            log.warn("No employees found for jobTitle={}", jobTitle);
+            throw new JobTitleNotFoundException(
+                    "No employees found for job title: " + jobTitle
+            );
+        }
+
+        log.debug("Average salary calculated = {}", avgSalary);
+
+        return new AverageSalaryResponseDTO(
+                jobTitle,
+                avgSalary,
+                "average salary for job title found"
+        );
     }
 }

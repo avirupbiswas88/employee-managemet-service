@@ -1,5 +1,6 @@
 package com.employee.controller;
 
+import com.employee.dto.AverageSalaryResponseDTO;
 import com.employee.service.SalaryStatisticsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -24,5 +25,18 @@ public class SalaryStatsController {
     @GetMapping("/salary/{country}")
     public ResponseEntity<?> getSalaryStats(@PathVariable String country) {
         return ResponseEntity.ok(salaryStatisticsService.getSalaryStats(country));
+    }
+
+    /**
+     * Returns average salary for employees with given job title.
+     *
+     * @param jobTitle employee job title
+     * @return average salary statistics
+     */
+    @GetMapping("/average-salary/{jobTitle}")
+    public ResponseEntity<?> getAverageSalary(
+            @PathVariable String jobTitle) {
+
+        return ResponseEntity.ok(salaryStatisticsService.getAverageSalary(jobTitle));
     }
 }
