@@ -14,6 +14,26 @@ import org.springframework.stereotype.Service;
 import java.util.DoubleSummaryStatistics;
 import java.util.List;
 
+/**
+ * Service implementation responsible for calculating employee
+ * salary statistics and analytics.
+ *
+ * <p>This service provides business logic to compute:
+ * <ul>
+ *     <li>Salary statistics by country (min, max, average)</li>
+ *     <li>Average salary by job title</li>
+ * </ul>
+ *
+ * <p>The service interacts with the repository layer to retrieve
+ * employee data and performs statistical calculations using
+ * Java Stream APIs.
+ *
+ * <p>Exceptions handled:
+ * <ul>
+ *     <li>EmployeeServiceGenericException</li>
+ *     <li>JobTitleNotFoundException</li>
+ * </ul>
+ */
 @Service
 public class SalaryStatisticsServiceImpl implements SalaryStatisticsService {
     private static final Logger log =
@@ -23,6 +43,23 @@ public class SalaryStatisticsServiceImpl implements SalaryStatisticsService {
     @Autowired
     EmployeeRepository repository;
 
+    /**
+     * Retrieves salary statistics for employees belonging to a specific country.
+     *
+     * <p>This method performs the following steps:
+     * <ol>
+     *     <li>Fetch employees by country from the repository</li>
+     *     <li>Calculate salary statistics using {@link DoubleSummaryStatistics}</li>
+     *     <li>Return minimum, maximum, and average salary values</li>
+     * </ol>
+     *
+     * @param country the country for which salary statistics are required
+     * @return {@link EmployeeStatsByCountryResponseDTO} containing salary statistics
+     *
+     * @throws EmployeeServiceGenericException
+     * if an error occurs while processing salary statistics
+     * @author Avirup Biswas
+     */
     @Override
     public EmployeeStatsByCountryResponseDTO getSalaryStats(String country) {
         try {
@@ -59,6 +96,32 @@ public class SalaryStatisticsServiceImpl implements SalaryStatisticsService {
         }
     }
 
+    /**
+     * Calculates the average salary of employees for a given job title.
+     *
+     * <p>The method retrieves aggregated salary data directly
+     * from the repository using a database-level query.
+     *
+     * <p>Processing steps:
+     * <ol>
+     *     <li>Validate job title input</li>
+     *     <li>Fetch average salary using repository query</li>
+     *     <li>Return formatted response DTO</li>
+     * </ol>
+     *
+     * @param jobTitle the job title used to calculate the average salary
+     *
+     * @return {@link AverageSalaryResponseDTO} containing the job title
+     * and its calculated average salary
+     *
+     * @throws IllegalArgumentException
+     * if job title is null or empty
+     *
+     * @throws JobTitleNotFoundException
+     * if no employees exist for the provided job title
+     *
+     * @author Avirup Biswas
+     */
     @Override
     public AverageSalaryResponseDTO getAverageSalary(String jobTitle) {
 

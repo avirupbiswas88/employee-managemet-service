@@ -9,6 +9,20 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * REST Controller responsible for providing salary analytics
+ * and statistical insights for employees.
+ *
+ * <p>This controller exposes APIs to:
+ * <ul>
+ *     <li>Retrieve salary statistics by country</li>
+ *     <li>Retrieve average salary by job title</li>
+ * </ul>
+ *
+ * <p>The controller delegates business logic to the
+ * {@link SalaryStatisticsService} service layer.
+ * @author Avirup Biswas
+ */
 @RestController
 @RequestMapping("/employees/stats")
 public class SalaryStatsController {
