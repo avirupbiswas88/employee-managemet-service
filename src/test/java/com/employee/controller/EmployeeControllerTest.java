@@ -236,4 +236,11 @@ public class EmployeeControllerTest {
                 .andExpect(jsonPath("$.netSalary").value(150000));
     }
 
+    @Test
+    void shouldReturnExceptionWhenEmployeeNotFound() throws Exception {
+
+        mockMvc.perform(get("/employees/395/salary"))
+                .andExpect(status().isNotFound());
+    }
+
 }
