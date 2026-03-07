@@ -1,11 +1,8 @@
 package com.employee.controller;
 
-import com.employee.dto.EmployeeSalaryResponseDTO;
-import com.employee.exception.EmployeeNotFoundException;
 import com.employee.service.EmployeeServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -56,8 +53,16 @@ public class EmployeeControllerTest {
                 {
                 "fullName":"Sambit Mukherjee",
                 "jobTitle":"Software Architect",
-                "country":"India",
+                "country":"United States",
                 "salary":900000
+                }
+                """;
+        String request3 = """
+                {
+                "fullName":"Anurima Biswas",
+                "jobTitle":"Sr. Developer",
+                "country":"Japan",
+                "salary":150000
                 }
                 """;
         mockMvc.perform(post("/employees/create")
@@ -67,6 +72,10 @@ public class EmployeeControllerTest {
         mockMvc.perform(post("/employees/create")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(request2))
+                .andExpect(status().isCreated());
+        mockMvc.perform(post("/employees/create")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request3))
                 .andExpect(status().isCreated());
     }
 
@@ -198,18 +207,33 @@ public class EmployeeControllerTest {
     @Test
     void shouldReturnSalaryDetailsForIndia() throws Exception {
 
-        EmployeeSalaryResponseDTO response =
-                new EmployeeSalaryResponseDTO(1L, 100000, 10000, 90000);
-
-        /*Mockito.when(employeeService.calculateSalary(1L))
-                .thenReturn(response);*/
-
-        mockMvc.perform(get("/employees/1/salary"))
+        mockMvc.perform(get("/employees/202/salary"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.Id").value(1))
+                .andExpect(jsonPath("$.id").value(202))
                 .andExpect(jsonPath("$.grossSalary").value(100000))
                 .andExpect(jsonPath("$.deduction").value(10000))
                 .andExpect(jsonPath("$.netSalary").value(90000));
+    }
+    @Test
+    void shouldReturnSalaryDetailsForUSA() throws Exception {
+
+        mockMvc.perform(get("/employees/203/salary"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(203))
+                .andExpect(jsonPath("$.grossSalary").value(900000))
+                .andExpect(jsonPath("$.deduction").value(108000))
+                .andExpect(jsonPath("$.netSalary").value(792000));
+    }
+
+    @Test
+    void shouldReturnSalaryDetailsForJapan() throws Exception {
+
+        mockMvc.perform(get("/employees/204/salary"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(204))
+                .andExpect(jsonPath("$.grossSalary").value(150000))
+                .andExpect(jsonPath("$.deduction").value(0))
+                .andExpect(jsonPath("$.netSalary").value(150000));
     }
 
 }

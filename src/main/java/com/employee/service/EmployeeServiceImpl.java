@@ -117,10 +117,19 @@ public class EmployeeServiceImpl implements EmployeeService {
             throw new EmployeeServiceGenericException("exception while calculating employee salary with exception- " + e.getMessage());
         }
     }
-
+    @Override
     public EmployeeSalaryResponseDTO findEmployeeSalary(Long id) {
         Employee employee = repository.findById(id)
                 .orElseThrow(() -> new EmployeeNotFoundException(id));
-        return null;
+        log.info("response from database: {}",employee);
+        return this.mapEmployeeSalaryResponseFromDatabase(employee);
+    }
+    private EmployeeSalaryResponseDTO mapEmployeeSalaryResponseFromDatabase(Employee emp) {
+        EmployeeSalaryResponseDTO empSalaryResponse = new EmployeeSalaryResponseDTO();
+        empSalaryResponse.setId(emp.getId());
+        empSalaryResponse.setGrossSalary(emp.getGrossSalary());
+        empSalaryResponse.setNetSalary(emp.getNetSalary());
+        empSalaryResponse.setDeduction(emp.getDeduction());
+        return empSalaryResponse;
     }
 }

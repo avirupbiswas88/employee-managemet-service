@@ -9,6 +9,9 @@ public class EmployeeSalaryResponseDTO {
     private double deduction;
     private double netSalary;
 
+    public EmployeeSalaryResponseDTO() {
+    }
+
     public EmployeeSalaryResponseDTO(Long id, double grossSalary, double deduction, double netSalary) {
         this.id = id;
         this.grossSalary = grossSalary;
