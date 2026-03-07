@@ -3,16 +3,16 @@ package com.employee.dto;
 import lombok.Data;
 
 @Data
-public class EmployeeSalaryResponseDTO {
+public class SalaryDetailsResponseDTO {
     private Long id;
     private double grossSalary;
     private double deduction;
     private double netSalary;
 
-    public EmployeeSalaryResponseDTO() {
+    public SalaryDetailsResponseDTO() {
     }
 
-    public EmployeeSalaryResponseDTO(Long id, double grossSalary, double deduction, double netSalary) {
+    public SalaryDetailsResponseDTO(Long id, double grossSalary, double deduction, double netSalary) {
         this.id = id;
         this.grossSalary = grossSalary;
         this.deduction = deduction;

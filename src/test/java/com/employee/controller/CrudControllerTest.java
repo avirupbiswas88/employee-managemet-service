@@ -1,6 +1,6 @@
 package com.employee.controller;
 
-import com.employee.service.EmployeeServiceImpl;
+import com.employee.service.CrudOperationsServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,12 +14,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class EmployeeControllerTest {
+public class CrudControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
     @InjectMocks
-    private EmployeeServiceImpl employeeService;
+    private CrudOperationsServiceImpl employeeService;
 
     /**
      * Verifies that a new Employee can be successfully created.

@@ -1,8 +1,8 @@
 package com.employee.service;
 
-import com.employee.dto.EmployeeRequestDTO;
-import com.employee.dto.EmployeeResponseDTO;
-import com.employee.dto.EmployeeSalaryResponseDTO;
+import com.employee.dto.CrudOperationsRequestDTO;
+import com.employee.dto.CrudOperationsResponseDTO;
+import com.employee.dto.SalaryDetailsResponseDTO;
 import com.employee.entity.Employee;
 import com.employee.exception.EmployeeNotFoundException;
 import com.employee.exception.EmployeeServiceGenericException;
@@ -16,20 +16,20 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class EmployeeServiceImpl implements EmployeeService {
+public class CrudOperationsServiceImpl implements CrudOperationsService {
 
     private static final Logger log =
-            LogManager.getLogger(EmployeeService.class);
+            LogManager.getLogger(CrudOperationsServiceImpl.class);
     @Autowired
     EmployeeRepository repository;
 
     @Override
-    public EmployeeResponseDTO create(EmployeeRequestDTO request) {
+    public CrudOperationsResponseDTO create(CrudOperationsRequestDTO request) {
         try {
             Employee employee = this.mapEmployeeEntityFromDto(request);
             this.calculateSalary(request, employee);
             Employee savedEmployee = repository.save(employee);
-            EmployeeResponseDTO response = this.mapEmployeeResponseFromDatabaseResponse(savedEmployee);
+            CrudOperationsResponseDTO response = this.mapEmployeeResponseFromDatabaseResponse(savedEmployee);
             log.info("employee created with Id: {} with metadata- {}", response.getId(), response);
             return response;
         } catch (Exception ex) {
@@ -39,7 +39,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public EmployeeResponseDTO getEmployee(Long id) {
+    public CrudOperationsResponseDTO getEmployee(Long id) {
         Employee employee = repository.findById(id)
                 .orElseThrow(() -> new EmployeeNotFoundException(id));
         log.debug("employee response from the database- {}", employee);
@@ -47,12 +47,12 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public List<EmployeeResponseDTO> getAllEmployees() {
+    public List<CrudOperationsResponseDTO> getAllEmployees() {
         return repository.findAll().stream().map(this::mapEmployeeResponseFromDatabaseResponse).toList();
     }
 
     @Override
-    public EmployeeResponseDTO updateEmployee(Long id, EmployeeRequestDTO request) {
+    public CrudOperationsResponseDTO updateEmployee(Long id, CrudOperationsRequestDTO request) {
         Employee employee = repository.findById(id)
                 .orElseThrow(() -> new EmployeeNotFoundException(id));
         try {
@@ -61,7 +61,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             employee.setCountry(request.getCountry());
             this.calculateSalary(request, employee);
             Employee updatedEmployee = repository.save(employee);
-            EmployeeResponseDTO response = this.mapEmployeeResponseFromDatabaseResponse(updatedEmployee);
+            CrudOperationsResponseDTO response = this.mapEmployeeResponseFromDatabaseResponse(updatedEmployee);
             log.info("employee updated with Id: {} and response- {}", response.getId(), response);
             return response;
         } catch (Exception ex) {
@@ -84,7 +84,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         return null;
     }
 
-    private Employee mapEmployeeEntityFromDto(EmployeeRequestDTO dto) {
+    private Employee mapEmployeeEntityFromDto(CrudOperationsRequestDTO dto) {
         Employee employee = new Employee();
         employee.setFullName(dto.getFullName());
         employee.setJobTitle(dto.getJobTitle());
@@ -92,8 +92,8 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employee;
     }
 
-    private EmployeeResponseDTO mapEmployeeResponseFromDatabaseResponse(Employee emp) {
-        EmployeeResponseDTO empResponse = new EmployeeResponseDTO();
+    private CrudOperationsResponseDTO mapEmployeeResponseFromDatabaseResponse(Employee emp) {
+        CrudOperationsResponseDTO empResponse = new CrudOperationsResponseDTO();
         empResponse.setId(emp.getId());
         empResponse.setFullName(emp.getFullName());
         empResponse.setJobTitle(emp.getJobTitle());
@@ -102,7 +102,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         return empResponse;
     }
 
-    private void calculateSalary(EmployeeRequestDTO request, Employee employee) {
+    private void calculateSalary(CrudOperationsRequestDTO request, Employee employee) {
         double grossSalary = request.getSalary();
         try {
             CountryTaxStrategy strategy =
@@ -118,14 +118,14 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
     }
     @Override
-    public EmployeeSalaryResponseDTO findEmployeeSalary(Long id) {
+    public SalaryDetailsResponseDTO findEmployeeSalary(Long id) {
         Employee employee = repository.findById(id)
                 .orElseThrow(() -> new EmployeeNotFoundException(id));
         log.info("response from database: {}",employee);
         return this.mapEmployeeSalaryResponseFromDatabase(employee);
     }
-    private EmployeeSalaryResponseDTO mapEmployeeSalaryResponseFromDatabase(Employee emp) {
-        EmployeeSalaryResponseDTO empSalaryResponse = new EmployeeSalaryResponseDTO();
+    private SalaryDetailsResponseDTO mapEmployeeSalaryResponseFromDatabase(Employee emp) {
+        SalaryDetailsResponseDTO empSalaryResponse = new SalaryDetailsResponseDTO();
         empSalaryResponse.setId(emp.getId());
         empSalaryResponse.setGrossSalary(emp.getGrossSalary());
         empSalaryResponse.setNetSalary(emp.getNetSalary());

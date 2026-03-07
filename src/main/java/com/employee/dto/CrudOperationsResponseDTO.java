@@ -3,7 +3,7 @@ package com.employee.dto;
 import lombok.Data;
 
 @Data
-public class EmployeeResponseDTO {
+public class CrudOperationsResponseDTO {
     private Long id;
     private String fullName;
     private String jobTitle;
