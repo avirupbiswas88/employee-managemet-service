@@ -8,7 +8,7 @@ public class EmployeeResponseDTO {
     private String fullName;
     private String jobTitle;
     private String country;
-    private Double salary;
+    private Double grossSalary;
 
     @Override
     public String toString() {
@@ -17,7 +17,7 @@ public class EmployeeResponseDTO {
                 ", fullName='" + fullName + '\'' +
                 ", jobTitle='" + jobTitle + '\'' +
                 ", country='" + country + '\'' +
-                ", salary=" + salary +
+                ", grossSalary=" + grossSalary +
                 '}';
     }
 }

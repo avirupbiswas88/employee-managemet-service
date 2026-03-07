@@ -25,4 +25,11 @@ public class ExceptionHandlerAdvice {
                 .body(ex.getMessage());
 
     }
+    @ExceptionHandler(EmployeeServiceGenericException.class)
+    public ResponseEntity<String> handleGenericException(
+            EmployeeServiceGenericException ex){
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ex.getMessage());
+    }
 }

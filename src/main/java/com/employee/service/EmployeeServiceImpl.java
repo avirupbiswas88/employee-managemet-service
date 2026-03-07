@@ -2,10 +2,12 @@ package com.employee.service;
 
 import com.employee.dto.EmployeeRequestDTO;
 import com.employee.dto.EmployeeResponseDTO;
+import com.employee.dto.EmployeeSalaryResponseDTO;
 import com.employee.entity.Employee;
 import com.employee.exception.EmployeeNotFoundException;
-import com.employee.exception.MissingRequiredDataException;
+import com.employee.exception.EmployeeServiceGenericException;
 import com.employee.repository.EmployeeRepository;
+import com.employee.util.CountryTaxStrategy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,21 +27,22 @@ public class EmployeeServiceImpl implements EmployeeService {
     public EmployeeResponseDTO create(EmployeeRequestDTO request) {
         try {
             Employee employee = this.mapEmployeeEntityFromDto(request);
+            this.calculateSalary(request, employee);
             Employee savedEmployee = repository.save(employee);
             EmployeeResponseDTO response = this.mapEmployeeResponseFromDatabaseResponse(savedEmployee);
-            log.info("employee created with Id: {}", response.getId());
+            log.info("employee created with Id: {} with metadata- {}", response.getId(), response);
             return response;
         } catch (Exception ex) {
-            log.info("exception occurred while transforming and saving employee data in database with exception: {}", ex.getMessage());
-            throw new MissingRequiredDataException("required data not found for Id: " + request);
+            log.error("exception occurred while transforming and saving employee data in database with exception: {}", ex.getMessage());
         }
-
+        return null;
     }
 
     @Override
     public EmployeeResponseDTO getEmployee(Long id) {
         Employee employee = repository.findById(id)
                 .orElseThrow(() -> new EmployeeNotFoundException(id));
+        log.debug("employee response from the database- {}", employee);
         return this.mapEmployeeResponseFromDatabaseResponse(employee);
     }
 
@@ -56,13 +59,13 @@ public class EmployeeServiceImpl implements EmployeeService {
             employee.setFullName(request.getFullName());
             employee.setJobTitle(request.getJobTitle());
             employee.setCountry(request.getCountry());
-            employee.setSalary(request.getSalary());
+            this.calculateSalary(request, employee);
             Employee updatedEmployee = repository.save(employee);
             EmployeeResponseDTO response = this.mapEmployeeResponseFromDatabaseResponse(updatedEmployee);
             log.info("employee updated with Id: {} and response- {}", response.getId(), response);
             return response;
         } catch (Exception ex) {
-            log.info("exception occurred while transforming and updating employee data in database with exception: {}", ex.getMessage());
+            log.error("exception occurred while transforming and updating employee data in database with exception: {}", ex.getMessage());
         }
         return null;
     }
@@ -76,7 +79,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             repository.deleteById(id);
             return id;
         } catch (Exception ex) {
-            log.info("exception occurred while deleting employee data in database with exception: {}", ex.getMessage());
+            log.error("exception occurred while deleting employee data in database with exception: {}", ex.getMessage());
         }
         return null;
     }
@@ -86,7 +89,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setFullName(dto.getFullName());
         employee.setJobTitle(dto.getJobTitle());
         employee.setCountry(dto.getCountry());
-        employee.setSalary(dto.getSalary());
         return employee;
     }
 
@@ -96,7 +98,29 @@ public class EmployeeServiceImpl implements EmployeeService {
         empResponse.setFullName(emp.getFullName());
         empResponse.setJobTitle(emp.getJobTitle());
         empResponse.setCountry(emp.getCountry());
-        empResponse.setSalary(emp.getSalary());
+        empResponse.setGrossSalary(emp.getGrossSalary());
         return empResponse;
+    }
+
+    private void calculateSalary(EmployeeRequestDTO request, Employee employee) {
+        double grossSalary = request.getSalary();
+        try {
+            CountryTaxStrategy strategy =
+                    CountryTaxStrategy.fromCountry(request.getCountry());
+            double deduction = strategy.calculateDeduction(grossSalary);
+            double netSalary = grossSalary - deduction;
+            employee.setGrossSalary(grossSalary);
+            employee.setNetSalary(netSalary);
+            employee.setDeduction(deduction);
+        } catch (Exception e) {
+            log.error("exception while calculating employee salary");
+            throw new EmployeeServiceGenericException("exception while calculating employee salary with exception- " + e.getMessage());
+        }
+    }
+
+    public EmployeeSalaryResponseDTO findEmployeeSalary(Long id) {
+        Employee employee = repository.findById(id)
+                .orElseThrow(() -> new EmployeeNotFoundException(id));
+        return null;
     }
 }

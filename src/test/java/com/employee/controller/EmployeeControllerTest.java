@@ -49,7 +49,7 @@ public class EmployeeControllerTest {
                 "fullName":"Avirup Biswas",
                 "jobTitle":"Software Developer",
                 "country":"India",
-                "salary":15000
+                "salary":100000
                 }
                 """;
         String request2 = """
@@ -157,10 +157,10 @@ public class EmployeeControllerTest {
 
     @Test
     void testGetEmployee() throws Exception {
-        mockMvc.perform(get("/employees/get/452")
+        mockMvc.perform(get("/employees/get/1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value("452"))
+                .andExpect(jsonPath("$.id").value("1"))
                 .andExpect(jsonPath("$.fullName").value("Avirup Biswas"));
     }
 
@@ -174,13 +174,13 @@ public class EmployeeControllerTest {
     @Test
     void testUpdateEmployee() throws Exception {
 
-        mockMvc.perform(put("/employees/update/352")
+        mockMvc.perform(put("/employees/update/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
                                 "fullName":"Avirup Biswas",
                                 "jobTitle":"IT",
-                                "salary":50000,
+                                "salary":150000,
                                 "country":"UK"
                                 }
                                 """))
@@ -201,8 +201,8 @@ public class EmployeeControllerTest {
         EmployeeSalaryResponseDTO response =
                 new EmployeeSalaryResponseDTO(1L, 100000, 10000, 90000);
 
-        Mockito.when(employeeService.calculateSalary(1L))
-                .thenReturn(response);
+        /*Mockito.when(employeeService.calculateSalary(1L))
+                .thenReturn(response);*/
 
         mockMvc.perform(get("/employees/1/salary"))
                 .andExpect(status().isOk())

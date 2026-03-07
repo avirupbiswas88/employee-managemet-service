@@ -20,6 +20,11 @@ public class Employee {
     @Column(nullable=false)
     private String country;
     @Column(nullable=false)
-    @Positive(message = "salary should be greater than zero")
-    private Double salary;
+    @Positive(message = "gross salary should be greater than zero")
+    private Double grossSalary;
+    @Column(nullable=false)
+    private Double deduction;
+    @Column(nullable=false)
+    @Positive(message = "net salary should be greater than zero")
+    private Double netSalary;
 }
