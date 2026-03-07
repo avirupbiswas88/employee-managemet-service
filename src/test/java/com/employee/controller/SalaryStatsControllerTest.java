@@ -37,4 +37,19 @@ public class SalaryStatsControllerTest {
                 .andExpect(jsonPath("$.responseMessage").value("country specific employee salary or employee stats not found"));
     }
 
+    @Test
+    void shouldReturnAverageSalary() throws Exception {
+        mockMvc.perform(
+                        get("/employees/stats/average-salary/Software Developer"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.jobTitle").value("Software Developer"));
+    }
+
+    @Test
+    void shouldReturnException_JobTitleNotFound() throws Exception {
+        mockMvc.perform(
+                        get("/employees/stats/average-salary/Principle Engineer"))
+                .andExpect(status().isNotFound());
+    }
+
 }
